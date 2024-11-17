@@ -8,49 +8,6 @@ LABEL version="2.2.0" description="API to control WhatsApp features through HTTP
 LABEL maintainer="Davidson Gomes" git="https://github.com/DavidsonGomes"
 LABEL contact="contato@atendai.com"
 
-WORKDIR /evolution
-
-COPY ./package.json ./tsconfig.json ./
-
-RUN npm install -f
-
-COPY ./src ./src
-COPY ./public ./public
-COPY ./prisma ./prisma
-COPY ./manager ./manager
-COPY ./runWithProvider.js ./
-COPY ./tsup.config.ts ./
-
-COPY ./Docker ./Docker
-
-RUN chmod +x ./Docker/scripts/* && dos2unix ./Docker/scripts/*
-
-RUN ./Docker/scripts/generate_database.sh
-
-RUN npm run build
-
-# Stage 2: Final
-FROM node:20-alpine AS final
-
-RUN apk update && \
-  apk add tzdata ffmpeg bash
-
-ENV TZ=America/Sao_Paulo
-
-WORKDIR /evolution
-
-# Copy necessary files from builder
-COPY --from=builder /evolution/package.json ./package.json
-COPY --from=builder /evolution/package-lock.json ./package-lock.json
-COPY --from=builder /evolution/node_modules ./node_modules
-COPY --from=builder /evolution/dist ./dist
-COPY --from=builder /evolution/prisma ./prisma
-COPY --from=builder /evolution/manager ./manager
-COPY --from=builder /evolution/public ./public
-COPY --from=builder /evolution/Docker ./Docker
-COPY --from=builder /evolution/runWithProvider.js ./runWithProvider.js
-COPY --from=builder /evolution/tsup.config.ts ./tsup.config.ts
-
 # Accept build arguments and set as environment variables
 # Server Configuration
 ARG SERVER_TYPE
@@ -135,6 +92,52 @@ ENV LANGUAGE=${LANGUAGE}
 
 # Additional Environment Variables
 ENV DOCKER_ENV=false
+
+# Continuation
+WORKDIR /evolution
+
+COPY ./package.json ./tsconfig.json ./
+
+RUN npm install -f
+
+COPY ./src ./src
+COPY ./public ./public
+COPY ./prisma ./prisma
+COPY ./manager ./manager
+COPY ./runWithProvider.js ./
+COPY ./tsup.config.ts ./
+
+COPY ./Docker ./Docker
+
+RUN chmod +x ./Docker/scripts/* && dos2unix ./Docker/scripts/*
+
+RUN ./Docker/scripts/generate_database.sh
+
+RUN npm run build
+
+# Stage 2: Final
+FROM node:20-alpine AS final
+
+RUN apk update && \
+  apk add tzdata ffmpeg bash
+
+ENV TZ=America/Sao_Paulo
+
+WORKDIR /evolution
+
+# Copy necessary files from builder
+COPY --from=builder /evolution/package.json ./package.json
+COPY --from=builder /evolution/package-lock.json ./package-lock.json
+COPY --from=builder /evolution/node_modules ./node_modules
+COPY --from=builder /evolution/dist ./dist
+COPY --from=builder /evolution/prisma ./prisma
+COPY --from=builder /evolution/manager ./manager
+COPY --from=builder /evolution/public ./public
+COPY --from=builder /evolution/Docker ./Docker
+COPY --from=builder /evolution/runWithProvider.js ./runWithProvider.js
+COPY --from=builder /evolution/tsup.config.ts ./tsup.config.ts
+
+
 
 EXPOSE 8080
 
