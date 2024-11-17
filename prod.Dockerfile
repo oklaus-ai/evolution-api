@@ -4,10 +4,6 @@ FROM node:20-alpine AS builder
 RUN apk update && \
   apk add git ffmpeg wget curl bash
 
-LABEL version="2.2.0" description="API to control WhatsApp features through HTTP requests." 
-LABEL maintainer="Davidson Gomes" git="https://github.com/DavidsonGomes"
-LABEL contact="contato@atendai.com"
-
 # Accept build arguments and set as environment variables
 # Server Configuration
 ARG SERVER_TYPE
@@ -90,11 +86,36 @@ ARG LANGUAGE
 
 ENV LANGUAGE=${LANGUAGE}
 
-# Additional Environment Variables
-ENV DOCKER_ENV=true
-
 # Continuation
 WORKDIR /evolution
+
+RUN echo "SERVER_TYPE=$SERVER_TYPE" >> .env && \
+  echo "SERVER_PORT=$SERVER_PORT" >> .env && \
+  echo "SERVER_URL=$SERVER_URL" >> .env && \
+  echo "CORS_ORIGIN=$CORS_ORIGIN" >> .env && \
+  echo "CORS_METHODS=$CORS_METHODS" >> .env && \
+  echo "CORS_CREDENTIALS=$CORS_CREDENTIALS" >> .env && \
+  echo "LOG_LEVEL=$LOG_LEVEL" >> .env && \
+  echo "LOG_COLOR=$LOG_COLOR" >> .env && \
+  echo "LOG_BAILEYS=$LOG_BAILEYS" >> .env && \
+  echo "EVENT_EMITTER_MAX_LISTENERS=$EVENT_EMITTER_MAX_LISTENERS" >> .env && \
+  echo "DEL_INSTANCE=$DEL_INSTANCE" >> .env && \
+  echo "DATABASE_PROVIDER=$DATABASE_PROVIDER" >> .env && \
+  echo "DATABASE_CONNECTION_URI=$DATABASE_CONNECTION_URI" >> .env && \
+  echo "DATABASE_CONNECTION_CLIENT_NAME=$DATABASE_CONNECTION_CLIENT_NAME" >> .env && \
+  echo "DATABASE_SAVE_DATA_INSTANCE=$DATABASE_SAVE_DATA_INSTANCE" >> .env && \
+  echo "DATABASE_SAVE_DATA_NEW_MESSAGE=$DATABASE_SAVE_DATA_NEW_MESSAGE" >> .env && \
+  echo "DATABASE_SAVE_MESSAGE_UPDATE=$DATABASE_SAVE_MESSAGE_UPDATE" >> .env && \
+  echo "DATABASE_SAVE_DATA_CONTACTS=$DATABASE_SAVE_DATA_CONTACTS" >> .env && \
+  echo "DATABASE_SAVE_DATA_CHATS=$DATABASE_SAVE_DATA_CHATS" >> .env && \
+  echo "DATABASE_SAVE_DATA_LABELS=$DATABASE_SAVE_DATA_LABELS" >> .env && \
+  echo "DATABASE_SAVE_DATA_HISTORIC=$DATABASE_SAVE_DATA_HISTORIC" >> .env && \
+  echo "DATABASE_SAVE_IS_ON_WHATSAPP=$DATABASE_SAVE_IS_ON_WHATSAPP" >> .env && \
+  echo "DATABASE_SAVE_IS_ON_WHATSAPP_DAYS=$DATABASE_SAVE_IS_ON_WHATSAPP_DAYS" >> .env && \
+  echo "DATABASE_DELETE_MESSAGE=$DATABASE_DELETE_MESSAGE" >> .env && \
+  echo "AUTHENTICATION_API_KEY=$AUTHENTICATION_API_KEY" >> .env && \
+  echo "AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=$AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES" >> .env && \
+  echo "LANGUAGE=$LANGUAGE" >> .env
 
 COPY ./package.json ./tsconfig.json ./
 
@@ -104,6 +125,7 @@ COPY ./src ./src
 COPY ./public ./public
 COPY ./prisma ./prisma
 COPY ./manager ./manager
+# COPY ./.env.example ./.env
 COPY ./runWithProvider.js ./
 COPY ./tsup.config.ts ./
 
@@ -133,11 +155,13 @@ COPY --from=builder /evolution/dist ./dist
 COPY --from=builder /evolution/prisma ./prisma
 COPY --from=builder /evolution/manager ./manager
 COPY --from=builder /evolution/public ./public
+COPY --from=builder /evolution/.env ./.env
 COPY --from=builder /evolution/Docker ./Docker
 COPY --from=builder /evolution/runWithProvider.js ./runWithProvider.js
 COPY --from=builder /evolution/tsup.config.ts ./tsup.config.ts
 
-
+# Additional Environment Variables
+ENV DOCKER_ENV=false
 
 EXPOSE 8080
 
