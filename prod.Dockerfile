@@ -134,7 +134,7 @@ ARG LANGUAGE
 ENV LANGUAGE=${LANGUAGE}
 
 # Additional Environment Variables
-ENV DOCKER_ENV=true
+ENV DOCKER_ENV=false
 
 EXPOSE 8080
 
