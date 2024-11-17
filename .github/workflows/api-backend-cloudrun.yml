@@ -49,6 +49,7 @@ jobs:
             --build-arg EVENT_EMITTER_MAX_LISTENERS=50 \
             --build-arg DEL_INSTANCE=false \
             --build-arg DATABASE_PROVIDER=postgresql \
+            --build-arg DATABASE_CONNECTION_URI=${{ secrets.DATABASE_CONNECTION_URI }} \
             --build-arg DATABASE_CONNECTION_CLIENT_NAME=evolution_exchange \
             --build-arg DATABASE_SAVE_DATA_INSTANCE=true \
             --build-arg DATABASE_SAVE_DATA_NEW_MESSAGE=true \
@@ -80,7 +81,7 @@ jobs:
           service: ${{ env.CR_SERVICE }}
           region: ${{ env.REGION }}
           image: "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}/wpp-provider-api:${{ github.sha }}"
-          secrets: |
-            DATABASE_CONNECTION_URI=WPP_API_PG_STRING:latest
+          # secrets: |
+          #   DATABASE_CONNECTION_URI=WPP_API_PG_STRING:latest
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
