@@ -91,7 +91,7 @@ ARG LANGUAGE
 ENV LANGUAGE=${LANGUAGE}
 
 # Additional Environment Variables
-ENV DOCKER_ENV=false
+ENV DOCKER_ENV=true
 
 # Continuation
 WORKDIR /evolution
