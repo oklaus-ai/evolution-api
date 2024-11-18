@@ -39,7 +39,7 @@ jobs:
           docker build \
             --build-arg SERVER_TYPE=http \
             --build-arg SERVER_PORT=8080 \
-            --build-arg SERVER_URL=https://wpp-provider-api-759517146534.us-central1.run.app \
+            --build-arg SERVER_URL=https://wpp.oklaus.com/ \
             --build-arg CORS_ORIGIN=* \
             --build-arg CORS_METHODS=GET,POST,PUT,DELETE \
             --build-arg CORS_CREDENTIALS=true \
