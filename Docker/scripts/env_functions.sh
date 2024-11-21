@@ -13,6 +13,6 @@ export_env_vars() {
         done < .env
     else
         echo ".env file not found"
-        exit 1
+        # exit 1
     fi
 }
